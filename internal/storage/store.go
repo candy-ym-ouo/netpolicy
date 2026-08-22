@@ -126,7 +126,7 @@ func (s *MemoryStore) DeleteRule(id string) error {
 	}
 	return nil
 }
-func (s *MemoryStore) RulesetVersion() int { s.mu.RLock(); defer s.mu.RUnlock(); return s.version }
+func (s *MemoryStore) RulesetVersion() int { return s.version }
 func (s *MemoryStore) CreateTask(t *model.AnalysisTask) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()

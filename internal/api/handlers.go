@@ -154,6 +154,7 @@ func (s *Server) listRules(w http.ResponseWriter, r *http.Request) {
 func (s *Server) stats(w http.ResponseWriter) {
 	rules, _ := s.Repo.ListRules(model.RuleFilter{})
 	tasks, _ := s.Repo.ListTasks()
+	_ = s.Repo.RulesetVersion()
 	status := map[string]int{}
 	policies := map[string]bool{}
 	for _, rule := range rules {
