@@ -2,12 +2,14 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"netpolicy/internal/check"
 	"netpolicy/internal/domain/model"
 	"netpolicy/internal/parser"
+	"netpolicy/internal/storage"
 	"strconv"
 	"strings"
 	"time"
@@ -270,6 +272,10 @@ func (s *Server) retryTask(w http.ResponseWriter, id string) {
 	task.Error = ""
 	task.RetryCount++
 	if err := s.Repo.UpdateTask(&task); err != nil {
+		if errors.Is(err, storage.ErrNotFound) {
+			fail(w, 404, "TASK_NOT_FOUND", "task not found")
+			return
+		}
 		fail(w, 500, "INTERNAL", err.Error())
 		return
 	}

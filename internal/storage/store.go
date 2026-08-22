@@ -2,6 +2,7 @@ package storage
 
 import (
 	"encoding/json"
+	"fmt"
 	"netpolicy/internal/domain/model"
 	"os"
 	"path/filepath"
@@ -153,7 +154,7 @@ func (s *MemoryStore) UpdateTask(t *model.AnalysisTask) error {
 	s.tasks[t.ID] = *t
 	if err := s.persist(); err != nil {
 		s.tasks[t.ID] = previous
-		return err
+		return fmt.Errorf("update task persistence failed: %v", err)
 	}
 	return nil
 }
