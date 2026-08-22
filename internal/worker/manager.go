@@ -81,14 +81,14 @@ func (m *Manager) execute(id string) {
 func selectRules(rules []model.Rule, params map[string]any) []model.Rule {
 	policies := map[string]bool{}
 	ids := map[string]bool{}
-	if values, ok := params["_policySets"].([]any); ok {
+	if values, ok := params["policySets"].([]any); ok {
 		for _, value := range values {
 			if text, ok := value.(string); ok {
 				policies[text] = true
 			}
 		}
 	}
-	if values, ok := params["_ruleIds"].([]any); ok {
+	if values, ok := params["ruleIds"].([]any); ok {
 		for _, value := range values {
 			if text, ok := value.(string); ok {
 				ids[text] = true
