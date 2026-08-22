@@ -224,8 +224,8 @@ func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
 	if q.Params == nil {
 		q.Params = map[string]any{}
 	}
-	q.Params["_policySets"] = q.PolicySets
-	q.Params["_ruleIds"] = q.RuleIDs
+	q.Params["policySets"] = q.PolicySets
+	q.Params["ruleIds"] = q.RuleIDs
 	b, _ := json.Marshal(q.Params)
 	t.Params = string(b)
 	if err := s.Repo.CreateTask(t); err != nil {
