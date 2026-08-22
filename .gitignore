@@ -1,0 +1,7 @@
+netpolicy
+netpolicy-*
+server
+*.data.json
+*.db
+*.tar.gz
+.DS_Store
