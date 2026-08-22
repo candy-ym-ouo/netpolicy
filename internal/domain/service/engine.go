@@ -67,10 +67,7 @@ func (e Engine) matrix(rules []model.Rule, params map[string]any) (map[string]an
 	if err != nil {
 		return nil, err
 	}
-	protocol, _ := params["protocol"].(string)
-	if protocol == "" {
-		protocol = "any"
-	}
+	protocol := params["protocol"].(string)
 	if len(sources) == 0 || len(targets) == 0 || len(ports) == 0 {
 		return nil, fmt.Errorf("sources, targets and ports are required")
 	}
