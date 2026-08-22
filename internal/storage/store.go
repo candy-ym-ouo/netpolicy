@@ -2,6 +2,7 @@ package storage
 
 import (
 	"encoding/json"
+	"fmt"
 	"netpolicy/internal/domain/model"
 	"os"
 	"path/filepath"
@@ -115,7 +116,7 @@ func (s *MemoryStore) DeleteRule(id string) error {
 	defer s.mu.Unlock()
 	r, ok := s.rules[id]
 	if !ok {
-		return ErrNotFound
+		return fmt.Errorf("delete rule %s: %v", id, ErrNotFound)
 	}
 	delete(s.rules, id)
 	s.version++

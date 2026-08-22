@@ -2,12 +2,14 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"netpolicy/internal/check"
 	"netpolicy/internal/domain/model"
 	"netpolicy/internal/parser"
+	"netpolicy/internal/storage"
 	"strconv"
 	"strings"
 	"time"
@@ -182,7 +184,11 @@ func (s *Server) getRule(w http.ResponseWriter, id string) {
 }
 func (s *Server) deleteRule(w http.ResponseWriter, r *http.Request, id string) {
 	if e := s.Repo.DeleteRule(id); e != nil {
-		fail(w, 404, "RULE_NOT_FOUND", e.Error())
+		if errors.Is(e, storage.ErrNotFound) {
+			fail(w, 404, "RULE_NOT_FOUND", e.Error())
+			return
+		}
+		fail(w, 500, "INTERNAL", e.Error())
 	} else {
 		write(w, 200, map[string]any{"deleted": true, "rulesetVersion": s.Repo.RulesetVersion()})
 	}
