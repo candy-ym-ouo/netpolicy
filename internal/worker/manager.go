@@ -39,6 +39,15 @@ func (m *Manager) Enqueue(id string) {
 	case <-m.done:
 	}
 }
+func (m *Manager) EnqueueContext(ctx context.Context, id string) {
+	select {
+	case m.queue <- id:
+	case <-m.done:
+	case <-ctx.Done():
+	default:
+		go func() { m.queue <- id }()
+	}
+}
 func (m *Manager) run(ctx context.Context) {
 	defer m.wg.Done()
 	for {

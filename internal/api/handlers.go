@@ -232,7 +232,7 @@ func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
 		fail(w, 500, "INTERNAL", err.Error())
 		return
 	}
-	s.Workers.Enqueue(id)
+	s.Workers.EnqueueContext(r.Context(), id)
 	write(w, 202, map[string]string{"taskId": id, "status": "pending"})
 }
 func selectRules(rules []model.Rule, policySets, ruleIDs []string) []model.Rule {
