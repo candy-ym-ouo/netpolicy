@@ -34,9 +34,13 @@ func New(repo storage.Repository, engine service.Engine, n int) *Manager {
 	return m
 }
 func (m *Manager) Enqueue(id string) {
+	m.EnqueueContext(context.Background(), id)
+}
+func (m *Manager) EnqueueContext(ctx context.Context, id string) {
 	select {
 	case m.queue <- id:
 	case <-m.done:
+	case <-ctx.Done():
 	}
 }
 func (m *Manager) run(ctx context.Context) {
