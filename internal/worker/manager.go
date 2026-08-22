@@ -61,6 +61,7 @@ func (m *Manager) execute(id string) {
 	}
 	var params map[string]any
 	_ = json.Unmarshal([]byte(t.Params), &params)
+	params["_worker"] = true
 	rules, _ := m.repo.ListRules(model.RuleFilter{})
 	rules = selectRules(rules, params)
 	value, err := m.engine.Analyze(t.Type, rules, params)

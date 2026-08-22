@@ -316,6 +316,12 @@ func (s *MemoryStore) Import(data []byte) error {
 		s.results[r.TaskID] = r
 	}
 	s.audit = d.Audit
+	for _, task := range s.tasks {
+		if task.Params == "null" {
+			task.Params = ""
+			s.tasks[task.ID] = task
+		}
+	}
 	s.nextAudit = 0
 	for _, entry := range s.audit {
 		if entry.ID > s.nextAudit {
