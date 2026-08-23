@@ -79,37 +79,32 @@ func (m *Manager) execute(id string) {
 	_ = m.repo.UpdateTask(&t)
 }
 func selectRules(rules []model.Rule, params map[string]any) []model.Rule {
-	policies := map[string]bool{}
-	ids := map[string]bool{}
-	if values, ok := params["_policySets"].([]any); ok {
-		for _, value := range values {
-			if text, ok := value.(string); ok {
-				policies[text] = true
-			}
-		}
+	policySets := stringList(params, "policySets")
+	// Backward compatibility: older archived task params may carry the legacy
+	// "_policySets" key. Fall back to it only when the canonical key is absent.
+	if len(policySets) == 0 {
+		policySets = stringList(params, "_policySets")
 	}
-	if values, ok := params["ruleIds"].([]any); ok {
-		for _, value := range values {
-			if text, ok := value.(string); ok {
-				ids[text] = true
-			}
-		}
+	ruleIDs := stringList(params, "ruleIds")
+	return model.FilterRules(rules, policySets, ruleIDs)
+}
+
+// stringList extracts a string slice from params[key], tolerating a missing
+// key (returns nil) or non-string entries (they are skipped).
+func stringList(params map[string]any, key string) []string {
+	values, ok := params[key].([]any)
+	if !ok {
+		return nil
 	}
-	if len(policies) == 0 && len(ids) == 0 {
-		return rules
-	}
-	out := make([]model.Rule, 0, len(rules))
-	for _, rule := range rules {
-		if len(policies) > 0 && !policies[rule.PolicySet] {
-			continue
+	out := make([]string, 0, len(values))
+	for _, value := range values {
+		if text, ok := value.(string); ok {
+			out = append(out, text)
 		}
-		if len(ids) > 0 && !ids[rule.ID] {
-			continue
-		}
-		out = append(out, rule)
 	}
 	return out
 }
+
 func (m *Manager) Close() { close(m.done); m.cancel(); m.wg.Wait() }
 
 var _ = fmt.Sprint

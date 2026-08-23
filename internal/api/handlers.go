@@ -195,7 +195,7 @@ func (s *Server) analyze(w http.ResponseWriter, r *http.Request, kind string) {
 	}
 	rules, _ := s.Repo.ListRules(model.RuleFilter{})
 	if len(q.PolicySets) > 0 || len(q.RuleIDs) > 0 {
-		rules = selectRules(rules, q.PolicySets, q.RuleIDs)
+		rules = model.FilterRules(rules, q.PolicySets, q.RuleIDs)
 	}
 	v, e := s.Engine.Analyze(kind, rules, q.Params)
 	if e != nil {
@@ -234,27 +234,6 @@ func (s *Server) createTask(w http.ResponseWriter, r *http.Request) {
 	}
 	s.Workers.Enqueue(id)
 	write(w, 202, map[string]string{"taskId": id, "status": "pending"})
-}
-func selectRules(rules []model.Rule, policySets, ruleIDs []string) []model.Rule {
-	policies := map[string]bool{}
-	ids := map[string]bool{}
-	for _, value := range policySets {
-		policies[value] = true
-	}
-	for _, value := range ruleIDs {
-		ids[value] = true
-	}
-	out := make([]model.Rule, 0, len(rules))
-	for _, rule := range rules {
-		if len(policies) > 0 && !policies[rule.PolicySet] {
-			continue
-		}
-		if len(ids) > 0 && !ids[rule.ID] {
-			continue
-		}
-		out = append(out, rule)
-	}
-	return out
 }
 func (s *Server) retryTask(w http.ResponseWriter, id string) {
 	task, ok := s.Repo.GetTask(id)
